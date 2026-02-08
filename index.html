@@ -1,482 +1,658 @@
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDA / PDQ Online Calculator</title>
     <style>
-        :root {
-            --primary: #005a9c;
-            --primary-hover: #004578;
-            --accent: #28a745;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --border: #dee2e6;
-            --text-dark: #212529;
-            --text-muted: #6c757d;
-        }
+      :root {
+        --primary: #005a9c;
+        --primary-hover: #004578;
+        --accent: #28a745;
+        --bg: #f0f2f5;
+        --card-bg: #ffffff;
+        --border: #dee2e6;
+        --text-dark: #212529;
+        --text-muted: #6c757d;
+      }
 
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text-dark);
-            padding: 10px;
-            margin: 0;
-            line-height: 1.5;
-        }
+      body {
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text-dark);
+        padding: 10px;
+        margin: 0;
+        line-height: 1.5;
+      }
 
+      .container {
+        max-width: 1000px;
+        background: var(--card-bg);
+        padding: 25px;
+        border-radius: 12px;
+        margin: 15px auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      h2,
+      h3 {
+        text-align: center;
+        color: var(--primary);
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--bg);
+        padding-bottom: 15px;
+      }
+
+      .input-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-dark);
+      }
+
+      input[type="number"] {
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 16px;
+        transition: all 0.2s;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(0, 90, 156, 0.1);
+      }
+
+      .checkbox-row {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 12px;
+        padding-top: 10px;
+        flex-wrap: wrap;
+      }
+
+      .checkbox-row label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        background: #fff;
+        padding: 8px 14px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        transition: background 0.2s;
+      }
+
+      .checkbox-row label:hover {
+        background: #f0f7ff;
+      }
+
+      .calc-btn {
+        grid-column: 1 / -1;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: bold;
+        background-color: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: background 0.2s;
+      }
+
+      .calc-btn:hover {
+        background-color: var(--primary-hover);
+      }
+
+      .table-container {
+        overflow-x: auto;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      th {
+        background: #f1f3f5;
+        padding: 12px;
+        border-bottom: 2px solid var(--border);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        text-align: left;
+        letter-spacing: 0.5px;
+      }
+
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #f1f1f1;
+        font-size: 0.9rem;
+      }
+
+      .right {
+        text-align: right;
+        font-family: "Courier New", Courier, monospace;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .remarks {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-style: italic;
+      }
+
+      .manual-input {
+        width: 90px !important;
+        padding: 6px !important;
+        text-align: right;
+        border: 1px dashed var(--border) !important;
+      }
+
+      .subtotal {
+        background: #fafafa;
+        font-weight: 700;
+      }
+
+      .total-row {
+        background: #e7f3ff;
+        color: var(--primary);
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            max-width: 1000px;
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 12px;
-            margin: 15px auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          padding: 15px;
+          margin: 10px;
         }
-
-        h2, h3 {
-            text-align: center;
-            color: var(--primary);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--bg);
-            padding-bottom: 15px;
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
         }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #eee;
+        thead tr {
+          position: absolute;
+          top: -9999px;
+          left: -9999px;
         }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        tr {
+          border: 1px solid var(--border);
+          margin-bottom: 10px;
+          border-radius: 8px;
+          background: #fff;
         }
-
-        label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-dark);
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 16px; /* Prevents iOS zoom on focus */
-            transition: all 0.2s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,90,156,0.1);
-        }
-
-        .checkbox-row {
-            grid-column: 1 / -1;
-            display: flex;
-            gap: 12px;
-            padding-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .checkbox-row label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            background: #fff;
-            padding: 8px 14px;
-            border-radius: 20px;
-            border: 1px solid #ddd;
-            transition: background 0.2s;
-        }
-
-        .checkbox-row label:hover {
-            background: #f0f7ff;
-        }
-
-        .calc-btn {
-            grid-column: 1 / -1;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: bold;
-            background-color: var(--primary);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background 0.2s;
-        }
-
-        .calc-btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        th {
-            background: #f1f3f5;
-            padding: 12px;
-            border-bottom: 2px solid var(--border);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            text-align: left;
-            letter-spacing: 0.5px;
-        }
-
         td {
-            padding: 12px;
-            border-bottom: 1px solid #f1f1f1;
-            font-size: 0.9rem;
+          border: none;
+          border-bottom: 1px solid #eee;
+          position: relative;
+          padding-left: 50%;
+          text-align: right;
+          min-height: 40px;
         }
-
-        .right { 
-            text-align: right; 
-            font-family: 'Courier New', Courier, monospace; 
-            font-weight: 700;
-            color: #333;
+        td:last-child {
+          border-bottom: none;
         }
-
-        .remarks { 
-            color: var(--text-muted); 
-            font-size: 0.8rem; 
-            font-style: italic; 
+        td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 12px;
+          width: 45%;
+          text-align: left;
+          font-weight: 700;
+          color: var(--text-muted);
+          font-size: 0.7rem;
+          text-transform: uppercase;
         }
-
         .manual-input {
-            width: 90px !important;
-            padding: 6px !important;
-            text-align: right;
-            border: 1px dashed var(--border) !important;
+          width: 100% !important;
+          margin-top: 5px;
         }
-
-        .subtotal {
-            background: #fafafa;
-            font-weight: 700;
+        .right {
+          font-size: 1rem;
         }
-
         .total-row {
-            background: #e7f3ff;
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 1.1rem;
+          font-size: 1rem;
         }
-
-        .hidden { display: none; }
-
-        /* Mobile specific Card View */
-        @media (max-width: 768px) {
-            .container { padding: 15px; margin: 10px; }
-            
-            table, thead, tbody, th, td, tr { 
-                display: block; 
-            }
-            
-            thead tr { 
-                position: absolute; 
-                top: -9999px; 
-                left: -9999px; 
-            }
-            
-            tr { 
-                border: 1px solid var(--border); 
-                margin-bottom: 10px; 
-                border-radius: 8px;
-                background: #fff;
-            }
-            
-            td { 
-                border: none; 
-                border-bottom: 1px solid #eee; 
-                position: relative; 
-                padding-left: 50%; 
-                text-align: right; 
-                min-height: 40px;
-            }
-            
-            td:last-child { border-bottom: none; }
-            
-            td::before { 
-                content: attr(data-label); 
-                position: absolute; 
-                left: 12px; 
-                width: 45%; 
-                text-align: left; 
-                font-weight: 700; 
-                color: var(--text-muted);
-                font-size: 0.7rem;
-                text-transform: uppercase;
-            }
-
-            .manual-input { width: 100% !important; margin-top: 5px; }
-            .right { font-size: 1rem; }
-            .total-row { font-size: 1rem; }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="container">
+      <h2>PDA / PDQ Online Calculator</h2>
 
-<div class="container">
-    <h2>PDA / PDQ Online Calculator</h2>
-
-    <div class="input-grid">
+      <div class="input-grid">
         <div class="input-group">
-            <label>Gross Tonnage (GRT)</label>
-            <input type="number" id="grt" value="00" oninput="calc()">
+          <label>Gross Tonnage (GRT)</label>
+          <input type="number" id="grt" value="0" oninput="calc()" />
         </div>
         <div class="input-group">
-            <label>Net Tonnage (NRT)</label>
-            <input type="number" id="nrt" value="00" oninput="calc()">
+          <label>Net Tonnage (NRT)</label>
+          <input type="number" id="nrt" value="0" oninput="calc()" />
         </div>
         <div class="checkbox-row">
-            <label><input type="checkbox" id="oil" onchange="calc()"> OIL TANKER</label>
-            <label><input type="checkbox" id="ihm" onchange="calc()"> IHM REPORT</label>
-            <label><input type="checkbox" id="crewChk" onchange="calc()"> CREW REPATRIATION</label>
+          <label
+            ><input type="checkbox" id="oil" onchange="calc()" /> OIL
+            TANKER</label
+          >
+          <label
+            ><input type="checkbox" id="ihm" onchange="calc()" /> IHM
+            REPORT</label
+          >
+          <label
+            ><input type="checkbox" id="crewChk" onchange="calc()" /> CREW
+            REPATRIATION</label
+          >
         </div>
         <button class="calc-btn" onclick="calc()">Calculate PDA</button>
-    </div>
+      </div>
 
-    <div class="table-container">
+      <div class="table-container">
         <table>
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th style="text-align: right;">Amount (USD)</th>
-                    <th>Remarks</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td data-label="Description">1. Port Dues</td>
-                    <td data-label="Amount" class="right" id="res_i1">0.00</td>
-                    <td data-label="Remarks" class="remarks">GRT × 0.306</td>
-                </tr>
-                <tr>
-                    <td data-label="Description" id="i2desc">2. Pilotage / Tug</td>
-                    <td data-label="Amount" class="right" id="res_i2">0.00</td>
-                    <td data-label="Remarks" class="remarks" id="rem_i2">Slab Based</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">3. Tug Charges (Slab)</td>
-                    <td data-label="Amount" class="right" id="res_i3">0.00</td>
-                    <td data-label="Remarks" class="remarks">Port Tariff</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">4. VAT @15%</td>
-                    <td data-label="Amount" class="right" id="res_i4">0.00</td>
-                    <td data-label="Remarks" class="remarks" id="vatText">15% on 1,2,3</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">5. NRT Based Charges</td>
-                    <td data-label="Amount" class="right" id="res_i5">0.00</td>
-                    <td data-label="Remarks" class="remarks">(NRT×10+25%)/120</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">6. Vessel Arrival & Doc</td>
-                    <td data-label="Amount" class="right"><input id="m6" type="number" value="1000" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">7. Custom Supp. IGM</td>
-                    <td data-label="Amount" class="right"><input id="m7" type="number" value="700" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-                <tr id="oilRow" class="hidden">
-                    <td data-label="Description">8. Explosive NOC & Insp.</td>
-                    <td data-label="Amount" class="right"><input id="oilAmt" type="number" value="1000" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Oil Tanker</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">9. Customs Rummage Boat</td>
-                    <td data-label="Amount" class="right"><input id="m9" type="number" value="700" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">10. Customs Rummage NOC</td>
-                    <td data-label="Amount" class="right"><input id="m10" type="number" value="700" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-                <tr id="ihmRow" class="hidden">
-                    <td data-label="Description">11. IHM Inspection Team</td>
-                    <td data-label="Amount" class="right"><input id="ihmAmt" type="number" value="2000" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">IHM Report</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">12. Source Tax / VAT</td>
-                    <td data-label="Amount" class="right"><input id="m12" type="number" value="150" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">13. Agency Fees</td>
-                    <td data-label="Amount" class="right"><input id="m13" type="number" value="750" class="manual-input" oninput="calc()"></td>
-                    <td data-label="Remarks" class="remarks">Manual</td>
-                </tr>
-            </tbody>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="text-align: right">Amount (USD)</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Description" id="desc_i1">
+                Port dues charges to Chittagong Port Authority @ USD 0.306 per
+                GRT for 0 MT at actual
+              </td>
+              <td data-label="Amount" class="right" id="res_i1">0.00</td>
+              <td data-label="Remarks" class="remarks">GRT × 0.306</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Port pilot age charges at actual @ USD 0.1200 of GRT as per Port
+                Tariff Minimum Ch.
+              </td>
+              <td data-label="Amount" class="right" id="res_i2">0.00</td>
+              <td data-label="Remarks" class="remarks">As per Tariff</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Port tug charges mandatory minimum @ USD as per Port Tariff
+                Minimum Ch.
+              </td>
+              <td data-label="Amount" class="right" id="res_i3">0.00</td>
+              <td data-label="Remarks" class="remarks">Port Tariff</td>
+            </tr>
+            <tr>
+              <td data-label="Description" id="desc_vat">
+                In-addition Circular of National Board of Revenue, Dhaka,
+                Bangladesh to be added 15% VAT include on Total Port Dues Amount
+                i.e. USD 0.00 ×15% as per NBR Govt. circular
+              </td>
+              <td data-label="Amount" class="right" id="res_i4">0.00</td>
+              <td data-label="Remarks" class="remarks" id="vatText">
+                15% on 1,2,3
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Custom light dues per NRT 10TK. & in addition on 15% VAT & 10%
+                AIT as per Challan
+              </td>
+              <td data-label="Amount" class="right" id="res_i5">0.00</td>
+              <td data-label="Remarks" class="remarks">(NRT×10+25%)/120</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                • Expenses in relation to vessels arrival and documentation for
+                port declaration<br />
+                • Shipping Master office/Booking /port health etc<br />
+                • Inward, Outward + Beaching permission formalities of vessel<br />
+                • Custom formalities as Gratuity for attending at O/A.<br />
+                • Customs officer’s attendance fees at O/A on arrival of the
+                vessel, MOT bill etc.<br />
+                • Ship handling permission from central bank. As related
+                expenses
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m6"
+                  type="number"
+                  value="1000"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Custom Supplementary IGM acceptance for custom house as expenses
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m7"
+                  type="number"
+                  value="700"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+            <tr id="oilRow" class="hidden">
+              <td data-label="Description">
+                Explosive NOC issued & inspection team on Board with Tug Boat
+                Hire Charges at O/A
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="oilAmt"
+                  type="number"
+                  value="1000"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Oil Tanker</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Custom Team & Rummage Team tug Boat hire Charges at O/A
+                Chittagong Port on arrival day for inspection on Board
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m9"
+                  type="number"
+                  value="700"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                Custom Supplementary IGM acceptance for custom house as expenses
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m10"
+                  type="number"
+                  value="700"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+            <tr id="ihmRow" class="hidden">
+              <td data-label="Description">
+                IHM Inspection & Report Team onboard in Bangladesh if necessary
+                but mandatory (including boat hire & Local Transportation for
+                inspection team)
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="ihmAmt"
+                  type="number"
+                  value="2000"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">IHM Report</td>
+            </tr>
+            <tr>
+              <td data-label="Description">
+                20% Source Tax/Vat for central bank deposit
+              </td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m12"
+                  type="number"
+                  value="150"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+            <tr>
+              <td data-label="Description">Agency fees</td>
+              <td data-label="Amount" class="right">
+                <input
+                  id="m13"
+                  type="number"
+                  value="750"
+                  class="manual-input"
+                  oninput="calc()"
+                />
+              </td>
+              <td data-label="Remarks" class="remarks">Manual</td>
+            </tr>
+          </tbody>
         </table>
+      </div>
     </div>
-</div>
 
-<div class="container hidden" id="crewBox">
-    <h3>Crew Repatriation Expenses</h3>
-    <div class="input-grid">
-        <div class="input-group">
-            <label>No. of Crew</label>
-            <input type="number" id="crewNo" value="20" oninput="calc()">
-        </div>
-        <div class="input-group">
-            <label>Govt. Rate / Crew</label>
-            <input type="number" id="govRate" value="120" oninput="calc()">
-        </div>
-        <div class="input-group">
-            <label>Hotel Rate / Day</label>
-            <input type="number" id="hotelRate" value="60" oninput="calc()">
-        </div>
-        <div class="input-group">
-            <label>Transportation</label>
-            <input type="number" id="crewTransport" value="400" oninput="calc()">
-        </div>
-    </div>
-    <div class="table-container">
-        <table>
-            <tbody>
-                <tr>
-                    <td data-label="Description">Govt. Formalities</td>
-                    <td data-label="Amount" class="right" id="res_crewGovt">0.00</td>
-                    <td data-label="Remarks" class="remarks">Crew × Rate</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">Hotel Exp. (2 Days)</td>
-                    <td data-label="Amount" class="right" id="res_crewHotel">0.00</td>
-                    <td data-label="Remarks" class="remarks">Crew × Rate × 2</td>
-                </tr>
-                <tr>
-                    <td data-label="Description">Transportation</td>
-                    <td data-label="Amount" class="right" id="res_crewTrans">0.00</td>
-                    <td data-label="Remarks" class="remarks">Actual</td>
-                </tr>
-                <tr class="subtotal">
-                    <td data-label="Description">Crew Repatriation Total</td>
-                    <td data-label="Amount" class="right" id="res_crewTotal">0.00</td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="container">
-    <table>
+    <!-- TOTAL BEFORE CREW -->
+    <div class="container" id="beforeCrewBox">
+      <table>
         <tr class="total-row">
-            <td style="width: 50%;">GRAND TOTAL (ESTIMATED)</td>
-            <td class="right" id="res_grand" style="width: 30%;">0.00</td>
-            <td class="remarks" style="width: 20%; text-align: center;">USD</td>
+          <td style="width: 50%">Total Port DA in USD</td>
+          <td class="right" id="res_beforeCrew" style="width: 30%">0.00</td>
+          <td class="remarks" style="width: 20%; text-align: center">USD</td>
         </tr>
-    </table>
-</div>
+      </table>
+    </div>
 
-<script>
-    function roundBD(x) {
+    <div class="container hidden" id="crewBox">
+      <h3>Crew Repatriation Expenses</h3>
+      <div class="input-grid">
+        <div class="input-group">
+          <label>No. of Crew</label>
+          <input type="number" id="crewNo" value="20" oninput="calc()" />
+        </div>
+        <div class="input-group">
+          <label>Govt. Rate / Crew</label>
+          <input type="number" id="govRate" value="120" oninput="calc()" />
+        </div>
+        <div class="input-group">
+          <label>Hotel Rate</label>
+          <input type="number" id="hotelRate" value="60" oninput="calc()" />
+        </div>
+        <div class="input-group">
+          <label>Day</label>
+          <input type="number" id="hotelDay" value="2" oninput="calc()" />
+        </div>
+        <div class="input-group">
+          <label>Transportation</label>
+          <input
+            type="number"
+            id="crewTransport"
+            value="400"
+            oninput="calc()"
+          />
+        </div>
+      </div>
+      <div class="table-container">
+        <table>
+          <tbody>
+            <tr>
+              <td data-label="Description">Govt. Formalities</td>
+              <td data-label="Amount" class="right" id="res_crewGovt">0.00</td>
+              <td data-label="Remarks" class="remarks">Crew × Rate</td>
+            </tr>
+            <tr>
+              <td data-label="Description">Hotel Exp.</td>
+              <td data-label="Amount" class="right" id="res_crewHotel">0.00</td>
+              <td data-label="Remarks" class="remarks">Crew × Rate × Days</td>
+            </tr>
+            <tr>
+              <td data-label="Description">Transportation</td>
+              <td data-label="Amount" class="right" id="res_crewTrans">0.00</td>
+              <td data-label="Remarks" class="remarks">Actual</td>
+            </tr>
+            <tr class="subtotal">
+              <td data-label="Description">Crew Repatriation Total</td>
+              <td data-label="Amount" class="right" id="res_crewTotal">0.00</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="container">
+      <table>
+        <tr class="total-row">
+          <td style="width: 50%">GRAND TOTAL</td>
+          <td class="right" id="res_grand" style="width: 30%">0.00</td>
+          <td class="remarks" style="width: 20%; text-align: center">USD</td>
+        </tr>
+      </table>
+    </div>
+
+    <script>
+      function roundBD(x) {
         let d = x - Math.floor(x);
         return d <= 0.5 ? Math.floor(x) : Math.floor(x) + 1;
-    }
+      }
 
-    function calc() {
+      function calc() {
         const g = parseFloat(document.getElementById("grt").value) || 0;
         const n = parseFloat(document.getElementById("nrt").value) || 0;
 
         // Base Port Calculations
         const v1 = roundBD(g * 0.306);
-        
-        let v2, d2;
+
+        let v2;
         if (g < 10000) {
-            v2 = 800;
-            d2 = "Pilotage/Tug min. (Port Tariff)";
+          v2 = 800;
         } else {
-            v2 = roundBD(Math.ceil(g/1000) * 1000 * 0.12);
-            d2 = "Pilotage @ 0.1200 per GRT";
+          v2 = roundBD(Math.ceil(g / 1000) * 1000 * 0.12);
         }
 
-        const v3 = g >= 20001 ? 6830 : g >= 10001 ? 4100 : g >= 5001 ? 2460 : 1230;
+        const v3 =
+          g >= 20001 ? 6830 : g >= 10001 ? 4100 : g >= 5001 ? 2460 : 1230;
         const vB = v1 + v2 + v3;
         const v4 = roundBD(vB * 0.15);
         const v5 = roundBD((n * 10 * 1.25) / 120);
 
-        // Core Summation
-        let total = v1 + v2 + v3 + v4 + v5 
-            + (parseFloat(document.getElementById("m6").value) || 0)
-            + (parseFloat(document.getElementById("m7").value) || 0)
-            + (parseFloat(document.getElementById("m9").value) || 0)
-            + (parseFloat(document.getElementById("m10").value) || 0)
-            + (parseFloat(document.getElementById("m12").value) || 0)
-            + (parseFloat(document.getElementById("m13").value) || 0);
+        // Core Total (Before Crew)
+        let beforeCrewTotal =
+          v1 +
+          v2 +
+          v3 +
+          v4 +
+          v5 +
+          (parseFloat(document.getElementById("m6").value) || 0) +
+          (parseFloat(document.getElementById("m7").value) || 0) +
+          (parseFloat(document.getElementById("m9").value) || 0) +
+          (parseFloat(document.getElementById("m10").value) || 0) +
+          (parseFloat(document.getElementById("m12").value) || 0) +
+          (parseFloat(document.getElementById("m13").value) || 0);
 
-        // Oil Tanker Row
+        // Oil Tanker
         const isOil = document.getElementById("oil").checked;
         document.getElementById("oilRow").classList.toggle("hidden", !isOil);
-        if (isOil) total += (parseFloat(document.getElementById("oilAmt").value) || 0);
+        if (isOil)
+          beforeCrewTotal +=
+            parseFloat(document.getElementById("oilAmt").value) || 0;
 
-        // IHM Row
+        // IHM
         const isIhm = document.getElementById("ihm").checked;
         document.getElementById("ihmRow").classList.toggle("hidden", !isIhm);
-        if (isIhm) total += (parseFloat(document.getElementById("ihmAmt").value) || 0);
+        if (isIhm)
+          beforeCrewTotal +=
+            parseFloat(document.getElementById("ihmAmt").value) || 0;
 
-        // Crew Repatriation Box
+        // Crew Repatriation
+        let crewTotal = 0;
         const isCrew = document.getElementById("crewChk").checked;
         const crewBox = document.getElementById("crewBox");
         if (isCrew) {
-            crewBox.classList.remove("hidden");
-            const cN = parseFloat(document.getElementById("crewNo").value) || 0;
-            const cG = cN * (parseFloat(document.getElementById("govRate").value) || 0);
-            const cH = cN * (parseFloat(document.getElementById("hotelRate").value) || 0) * 2;
-            const cT = parseFloat(document.getElementById("crewTransport").value) || 0;
-            const cSum = cG + cH + cT;
-            
-            document.getElementById("res_crewGovt").innerText = cG.toFixed(2);
-            document.getElementById("res_crewHotel").innerText = cH.toFixed(2);
-            document.getElementById("res_crewTrans").innerText = cT.toFixed(2);
-            document.getElementById("res_crewTotal").innerText = cSum.toFixed(2);
-            total += cSum;
+          crewBox.classList.remove("hidden");
+          const cN = parseFloat(document.getElementById("crewNo").value) || 0;
+          const cG =
+            cN * (parseFloat(document.getElementById("govRate").value) || 0);
+          const cH =
+            cN *
+            (parseFloat(document.getElementById("hotelRate").value) || 0) *
+            (parseFloat(document.getElementById("hotelDay").value) || 0);
+          const cT =
+            parseFloat(document.getElementById("crewTransport").value) || 0;
+          crewTotal = cG + cH + cT;
+
+          document.getElementById("res_crewGovt").innerText = cG.toFixed(2);
+          document.getElementById("res_crewHotel").innerText = cH.toFixed(2);
+          document.getElementById("res_crewTrans").innerText = cT.toFixed(2);
+          document.getElementById("res_crewTotal").innerText =
+            crewTotal.toFixed(2);
         } else {
-            crewBox.classList.add("hidden");
+          crewBox.classList.add("hidden");
         }
 
-        // Final UI Mapping
+        const grandTotal = beforeCrewTotal + crewTotal;
+
+        // UI Mapping
         document.getElementById("res_i1").innerText = v1.toFixed(2);
         document.getElementById("res_i2").innerText = v2.toFixed(2);
         document.getElementById("res_i3").innerText = v3.toFixed(2);
         document.getElementById("res_i4").innerText = v4.toFixed(2);
         document.getElementById("res_i5").innerText = v5.toFixed(2);
-        document.getElementById("res_grand").innerText = total.toLocaleString(undefined, {minimumFractionDigits: 2});
-        
-        document.getElementById("rem_i2").innerText = d2;
-        document.getElementById("vatText").innerText = vB.toLocaleString() + " × 15%";
-    }
+        document.getElementById("res_beforeCrew").innerText =
+          beforeCrewTotal.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+          });
+        document.getElementById("res_grand").innerText =
+          grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 });
 
-    // Initial run
-    window.onload = calc;
-</script>
+        // Dynamic Text
+        document.getElementById(
+          "desc_i1"
+        ).innerHTML = `Port dues charges to Chittagong Port Authority @ USD 0.306 per GRT for ${g.toLocaleString()} MT at actual`;
 
-</body>
+        document.getElementById(
+          "desc_vat"
+        ).innerHTML = `In-addition Circular of National Board of Revenue, Dhaka, Bangladesh to be added 15% VAT include on Total Port Dues Amount i.e. USD ${vB.toFixed(
+          2
+        )} ×15% as per NBR Govt. circular`;
+      }
+
+      window.onload = calc;
+    </script>
+  </body>
 </html>
