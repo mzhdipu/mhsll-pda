@@ -557,9 +557,10 @@
         // Base Port Calculations
         const v1 = roundBD(g * 0.306);
 
+        // UPDATED: Port pilotage charges per request
         let v2;
-        if (g < 10000) {
-          v2 = 800;
+        if (g <= 15000) {
+          v2 = roundBD(g * 0.12);
         } else {
           v2 = roundBD(Math.ceil(g / 1000) * 1000 * 0.12);
         }
