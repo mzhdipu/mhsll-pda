@@ -497,14 +497,14 @@
       // Port Pilotage Charges
       let v2;
       if (g <= 10000) {
-        v2 = 1230;
+        v2 = 1200;
       } else {
         const roundedGRT = Math.ceil(g / 1000) * 1000;
         v2 = roundBD(roundedGRT * 0.12);
       }
 
       const v3 =
-        g >= 20001 ? 6830 : g >= 10001 ? 4100 : g >= 5001 ? 2460 : 1230;
+        g >= 20001 ? 6830 : g >= 10001 ? 4100 : g >= 5001 ? 2460 : 1200;
       const vB = v1 + v2 + v3;
       const v4 = roundBD(vB * 0.15);
       const v5 = roundBD((n * 10 * 1.25) / 120);
